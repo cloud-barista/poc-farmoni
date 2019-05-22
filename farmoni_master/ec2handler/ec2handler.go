@@ -49,7 +49,8 @@ func CreateInstances(svc *ec2.EC2, imageID string, instanceType string,
         SecurityGroupIds:      []*string{
                         aws.String(securityGroupID), // set a security group.
 				},
-        SubnetId: aws.String("subnet-8c4a53e4"),     // set a subnet.
+        //SubnetId: aws.String("subnet-8c4a53e4"),     // set a subnet.
+        SubnetId: aws.String(subnetID),     // set a subnet.
     })
 
     if err != nil {

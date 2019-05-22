@@ -353,7 +353,9 @@ func copyAndPlayAgent(serverIP string, userName string, keyPath string) error {
 
         // file info to copy
         //sourceFile := "/root/go/src/farmoni/farmoni_agent/farmoni_agent"
-        sourceFile := "/root/go/src/github.com/cloud-barista/poc-farmoni/farmoni_agent/farmoni_agent"
+        //sourceFile := "/root/go/src/github.com/cloud-barista/poc-farmoni/farmoni_agent/farmoni_agent"
+	homePath := os.Getenv("HOME")
+        sourceFile := homePath + "/go/src/github.com/cloud-barista/poc-farmoni/farmoni_agent/farmoni_agent"
         targetFile := "/tmp/farmoni_agent"
 
         // command for ssh run

@@ -54,10 +54,13 @@
         // get Host Name
         hostname, _ := os.Hostname()
 
-        var readBytes [] uint64 = make([]uint64, 2)
-        var writeBytes [] uint64 = make([]uint64, 2)
-        var beforeReadBytes [] uint64 = make([]uint64, 2)
-        var beforeWriteBytes [] uint64 = make([]uint64, 2)
+	// get effective partion list
+	partitionList := diskstat.GetPartitionList()
+
+        var readBytes [] uint64 = make([]uint64, len(partitionList))
+        var writeBytes [] uint64 = make([]uint64, len(partitionList))
+        var beforeReadBytes [] uint64 = make([]uint64, len(partitionList))
+        var beforeWriteBytes [] uint64 = make([]uint64, len(partitionList))
 
         for{
                 println("[" + hostname + "]")
@@ -67,8 +70,6 @@
                 mem()
 
                 print("  [DSK RAT]")
-                // get effective partion list
-                partitionList := diskstat.GetPartitionList()
                 for i, partition := range partitionList {
                         print(partition + ": ")
 			readBytes[i], writeBytes[i] = diskstat.GetRWBytes(partition)

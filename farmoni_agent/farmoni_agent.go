@@ -59,18 +59,29 @@ import (
         return "  [MEM USG] TOTAL: " + strTotalMemM + "MB, USED: " + strUsedMemM + "MB, FREE: " + strFreeMemM + "MB"
  }
 
+
  // for global variables of disk statistics
- var readBytes [] uint64 = make([]uint64, 2)
- var writeBytes [] uint64 = make([]uint64, 2)
- var beforeReadBytes [] uint64 = make([]uint64, 2)
- var beforeWriteBytes [] uint64 = make([]uint64, 2)
+ var partitionList [] string
+ var readBytes [] uint64
+ var writeBytes [] uint64
+ var beforeReadBytes [] uint64
+ var beforeWriteBytes [] uint64
+
+ // get effective partion list
+ func init() {
+	partitionList = diskstat.GetPartitionList()
+	readBytes = make([]uint64, len(partitionList))
+	writeBytes = make([]uint64, len(partitionList))
+	beforeReadBytes = make([]uint64, len(partitionList))
+	beforeWriteBytes = make([]uint64, len(partitionList))
+ }
+
 
  func dsk() string {
 
 	dsk_stat := "  [DSK RAT]"
 
-	// get effective partion list
-	partitionList := diskstat.GetPartitionList()
+
 	for i, partition := range partitionList {
 		dsk_stat = dsk_stat + partition + ": "
 		readBytes[i], writeBytes[i] = diskstat.GetRWBytes(partition)

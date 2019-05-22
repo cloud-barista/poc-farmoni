@@ -9,9 +9,9 @@
 
  import (
          "os"
-         "farmoni/localmoni/cpu_usage"
-         "farmoni/localmoni/mem_usage"
-         "farmoni/localmoni/disk_stat"
+         "github.com/cloud-barista/poc-farmoni/localmoni/cpu_usage"
+         "github.com/cloud-barista/poc-farmoni/localmoni/mem_usage"
+         "github.com/cloud-barista/poc-farmoni/localmoni/disk_stat"
          "strconv"
          "time"
 	 "github.com/dustin/go-humanize"

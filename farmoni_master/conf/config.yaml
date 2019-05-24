@@ -1,7 +1,7 @@
 #### Config for farmoni PoC ####
 
 # Infos of etcd server
-etcdserverport: "129.254.175.43:2379"
+etcdserverport: "10.0.2.15:2379"
 
 ## Config for AWS ##
 aws:
@@ -9,39 +9,39 @@ aws:
 # Infos of Region
   region: ap-northeast-2
 # Infos for creating Instnaces
-  imageid: ami-047f7b46bd6dd5d84 
-  instancenameprefix: awspowerkim  # EC2's Tag Name for group instances' ID
+  imageid: ami-078e96948945fc2c9
+  instancenameprefix: aws-etri-shson  # EC2's Tag Name for group instances' ID
   instancetype: t2.micro
-  securitygroupid: sg-2334584f
-  subnetid: subnet-8c4a53e4
+  securitygroupid: sg-04c1c9c0e97125be9
+  subnetid: subnet-c3b446ab
 # for VM
-  username: ec2-user
-  keyname: aws.powerkim.keypair
-  keyfilepath: /root/.aws/awspowerkimkeypair.pem 
+  username: ubuntu
+  keyname: aws.shson.key
+  keyfilepath: /home/son/.aws/awsshsonkey.pem 
 
 
 ## Config for GCP ##
 gcp:
 
 # for credential
-  credentialfile: /root/.gcp/credentials
+  credentialfile: /home/son/.gce/credentials
 # Infos of Region
-  region: us-east1
-  zone: us-east1-c
+  region: asia-northeast2
+  zone: asia-northeast2-a
 # Project & Prefix for GCP
-  projectid: ornate-course-236606
-  prefix: https://www.googleapis.com/compute/v1/projects/ornate-course-236606
+  projectid: etri-shson-test
+  prefix: https://www.googleapis.com/compute/v1/projects/etri-shson-test
 # Infos for creating Instnaces
-  imageid: projects/gce-uefi-images/global/images/centos-7-v20190326
-  instancenameprefix: gcepowerkim
-  instancetype: https://www.googleapis.com/compute/v1/projects/ornate-course-236606/zones/us-east1-c/machineTypes/f1-micro
-  subnetid: https://www.googleapis.com/compute/v1/projects/ornate-course-236606/regions/us-east1/subnetworks/default
-  networkname: https://www.googleapis.com/compute/v1/projects/ornate-course-236606/global/networks/default
+  imageid: projects/ubuntu-os-cloud/global/images/ubuntu-1804-bionic-v20190514
+  instancenameprefix: etri-shson
+  instancetype: https://www.googleapis.com/compute/v1/projects/etri-shson-test/zones/asia-northeast2-a/machineTypes/n1-standard-1
+  subnetid: https://www.googleapis.com/compute/v1/projects/etri-shson-test/regions/asia-northeast2/subnetworks/default
+  networkname: https://www.googleapis.com/compute/v1/projects/etri-shson-test/global/networks/default
   serviceAccoutsMail: default
 # for VM
-  username: byoungseob
+  username: shson
   keyname: empty
-  keyfilepath: /root/.gcp/gcppowerkimkeypair.pem 
+  keyfilepath: /home/son/.gce/gcevmkey
 
 
 
@@ -49,10 +49,10 @@ gcp:
 azure:
 
 # for credential
-  credentialfile: /root/.azure/credentials
+  credentialfile: /home/son/.azure/azure.auth
 
-  groupname: VMGroupName
-  location: westus2
+  groupname: etri-shson-VMGroup
+  location: koreasouth
   virtualnetworkname: virtualNetworkName
   subnet1name: subnet1Name
   subnet2name: subnet2Name
@@ -60,10 +60,10 @@ azure:
 #  ipname: "ipName"
 #  nicname: "nicName"
 
-  basename: azurepowerkim
-  username: powerkim
-  password: powerkim
-  keyfilepath: /root/.azure/azurepowerkimkeypair.pem
-  publickeyfilepath: /root/.azure/azurepublickey.pem
+  basename: azureshson
+  username: shson
+  password: 
+  keyfilepath: /home/son/.azure/azurevmkey
+  publickeyfilepath: /home/son/.azure/azurevmkey.pub
 
 

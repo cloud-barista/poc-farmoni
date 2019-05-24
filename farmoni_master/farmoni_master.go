@@ -74,7 +74,7 @@ func parseRequest() {
         delVMAZURE = flag.Bool("delvm-azure", false, "delete all servers in AZURE: -delvm-azure")
 
         listvm = flag.Bool("listvm", false, "report server list: -listvm")
-        monitoring = flag.Bool("monitoring", false, "report all server' resources status: -monitoring")
+        monitoring = flag.Bool("monitor", false, "report all server' resources status: -monitor")
 
         flag.Parse()
 }
@@ -104,7 +104,7 @@ func main() {
         fmt.Println("go run farmoni_master.go -addvm-azure=5")
         fmt.Println("")
         fmt.Println("go run farmoni_master.go -listvm")
-        fmt.Println("go run farmoni_master.go -monitoring")
+        fmt.Println("go run farmoni_master.go -monitor")
 
 	// to delete all servers in aws
         fmt.Println("")

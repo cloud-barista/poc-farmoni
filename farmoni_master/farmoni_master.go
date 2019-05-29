@@ -79,6 +79,102 @@ func parseRequest() {
         flag.Parse()
 }
 
+func getInteractiveRequest() {
+
+	command := 0
+	fmt.Println("[Select opt (1:create-vm, 2:delete-vm, 3:list-vm, 4:monitor-vm]")
+	fmt.Print("Your section : ")
+	fmt.Scanln(&command)
+	fmt.Println(command)
+
+	/*
+        if command != 0 {
+                fmt.Println("######### addVMaws....")
+                addVMaws(*addVMNumAWS)
+		if command
+        }
+	*/
+	switch {
+	case command == 1:
+	        selCsp := 0
+	        fmt.Println("[Select cloud service provider (1:aws, 2:gcp, 3:azure, 4:TBD]")
+	        fmt.Print("Your section : ")
+	        fmt.Scanln(&selCsp)
+
+                selVmNum := 1
+                fmt.Println("[Provide the number of VM to create (e.g., 5)")
+                fmt.Print("Your section : ")
+                fmt.Scanln(&selVmNum)
+
+	        switch {
+	        case selCsp == 0:
+		        fmt.Println("nothing was selected")
+	        case selCsp == 1:
+		        fmt.Println("Create VM(s) in aws")
+			*addVMNumAWS = selVmNum
+                case selCsp == 2:
+                        fmt.Println("Create VM(s) in gcp")
+                        *addVMNumGCP = selVmNum
+                case selCsp == 3:
+                        fmt.Println("Create VM(s) in azure")
+                        *addVMNumAZURE = selVmNum
+		case selCsp == 4:
+                        fmt.Println("not implemented yet. will be provided soon")
+                default:
+                        fmt.Println("select within 1-4")
+		}
+	case command == 2:
+                selCsp := 0
+                fmt.Println("[Select cloud service provider (1:aws, 2:gcp, 3:azure, 4:TBD]")
+                fmt.Print("Your section : ")
+                fmt.Scanln(&selCsp)
+
+                switch {
+                case selCsp == 0:
+                        fmt.Println("nothing was selected")
+                case selCsp == 1:
+                        fmt.Println("Delete all VMs in aws")
+                        *delVMAWS = true
+                case selCsp == 2:
+                        fmt.Println("Delete all VMs in gcp")
+                        *delVMGCP = true
+                case selCsp == 3:
+                        fmt.Println("Delete all VMs in azure")
+                        *delVMAZURE = true
+                case selCsp == 4:
+                        fmt.Println("not implemented yet. will be provided soon")
+                default:
+                        fmt.Println("select within 1-4")
+                }
+	case command == 3:
+                *listvm = true
+	case command == 4:
+                *monitoring = true
+	default:
+		fmt.Println("select within 1-4")
+	}
+
+
+	/*
+        fetchType = flag.String("fetchtype", "PULL", "fetch type: -fetchtype=PUSH")
+
+        addVMNumAWS = flag.Int("addvm-aws", 0, "add servers in AWS: -addvm-aws=10")
+        delVMAWS = flag.Bool("delvm-aws", false, "delete all servers in AWS: -delvm-aws")
+
+        addVMNumGCP = flag.Int("addvm-gcp", 0, "add servers in GCP: -addvm-gcp=10")
+        delVMGCP = flag.Bool("delvm-gcp", false, "delete all servers in GCP: -delvm-gcp")
+
+        addVMNumAZURE = flag.Int("addvm-azure", 0, "add servers in AZURE: -addvm-azure=10")
+        delVMAZURE = flag.Bool("delvm-azure", false, "delete all servers in AZURE: -delvm-azure")
+
+        listvm = flag.Bool("listvm", false, "report server list: -listvm")
+        monitoring = flag.Bool("monitor", false, "report all server' resources status: -monitor")
+
+        flag.Parse()
+	*/
+}
+
+
 // 1. setup a credential info of AWS.
 // 2. setup a keypair for VM ssh login.
 
@@ -122,6 +218,8 @@ func main() {
 	// 1. parsing user's request.
 	parseRequest()
 
+	// Get interactive command request
+	getInteractiveRequest()
 
 //<add servers in AWS/GCP/AZURE>
 	// 1.1. create Servers(VM).
@@ -162,6 +260,7 @@ func main() {
                 fmt.Println("######### delete all servers in AZURE....")
                 delAllVMazure()
         }
+
 }
 
 

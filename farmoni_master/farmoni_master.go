@@ -21,6 +21,7 @@ import (
 	"context"
 	"time"
 	"log"
+	"strings"
 	"strconv"
         "google.golang.org/grpc"
         pb "github.com/cloud-barista/poc-farmoni/grpc_def"
@@ -124,14 +125,19 @@ func getInteractiveRequest() {
                         fmt.Println("select within 1-4")
 		}
 	case command == 2:
-                selCsp := 0
-                fmt.Println("[Select cloud service provider (1:aws, 2:gcp, 3:azure, 4:TBD]")
+                selCsp := -1
+		fmt.Println("[Select cloud service provider (0: all, 1:aws, 2:gcp, 3:azure, 4:TBD]")
                 fmt.Print("Your section : ")
                 fmt.Scanln(&selCsp)
 
                 switch {
-                case selCsp == 0:
+                case selCsp == -1:
                         fmt.Println("nothing was selected")
+                case selCsp == 0:
+                        fmt.Println("Delete all VMs for all CPSs")
+                        *delVMAWS = true
+			*delVMGCP = true
+			*delVMAZURE = true
                 case selCsp == 1:
                         fmt.Println("Delete all VMs in aws")
                         *delVMAWS = true
@@ -750,8 +756,10 @@ func serverList() {
 	list := getServerList()
 	fmt.Print("######### all server list....(" + strconv.Itoa(len(list)) + ")\n")
 
+
 	for _, v := range list {
-		fmt.Println(*v)
+		vs := strings.Split(string(*v), "/")
+		fmt.Println("[CSP] " + vs[0] + "\t/ [VmID] "+ vs[1] +"\t/ [IP] " + vs[2])
 	}	
 }
 
@@ -813,7 +821,11 @@ func monitoringAll() {
 	for {
 		list := getServerList()
 		for _, v := range list {
-			monitoringServer(*v)
+			vs := strings.Split(string(*v), "/")
+			println("-----monitoiring for------")
+			fmt.Println("[CSP] " + vs[0] + "\t/ [VmID] "+ vs[1] +"\t/ [IP] " + vs[2])
+
+			monitoringServer(vs[2])
 			println("-----------")
 		}
                 println("==============================")

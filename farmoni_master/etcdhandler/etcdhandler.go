@@ -101,9 +101,11 @@ func ServerList(ctx context.Context, cli *clientv3.Client) []*string {
 	for k, ev := range resp.Kvs {
 		//fmt.Printf("%s : %s\n", strings.Trim(string(ev.Key), "/server/"), ev.Value)
 		// /server/aws/i-1234567890abcdef0/129.254.175:2019
+
 		tmpStr := strings.Trim(string(ev.Key), "/server/")
-                tmpStrs := strings.Split(string(tmpStr), "/")
-                serverList[k] = &tmpStrs[2]
+                //tmpStrs := strings.Split(string(tmpStr), "/")
+                //serverList[k] = &tmpStrs[2]
+		serverList[k] = &tmpStr
 	}
 
 	return serverList

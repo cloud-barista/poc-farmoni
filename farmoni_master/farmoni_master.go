@@ -25,7 +25,62 @@ import (
 	"strconv"
         "google.golang.org/grpc"
         pb "github.com/cloud-barista/poc-farmoni/grpc_def"
+
+	// REST API (echo)
+	"net/http"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
+
+// REST API
+/*
+type (
+	user struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	}
+)
+var (
+	users = map[int]*user{}
+	seq   = 1
+)
+*/
+
+
+type (
+        svc struct {
+                ID   int    `json:"id"`
+		NAME string `json:"name"`
+	        CSP  string `json:"csp"`
+		NUM  int    `json:"num"`
+        }
+)
+var (
+        svcs = map[int]*svc{}
+        seqSvc   = 1
+)
+
+/*
+type (
+        svc struct {
+                ID   int    `json:"id"`
+                NAME string `json:"name"`
+                SERVER []struct {
+                        CSP  string `json:"csp"`
+                        NUM  int    `json:"num"`
+                        VMID string `json:"vmid"`
+                        IP   string `json:"ip"`
+                }`json:"server"`
+        }
+)
+var (
+        svcs = map[int]*svc{}
+        seqSvc   = 1
+)
+*/
+
+
+
 
 const (
 	defaultServerName = "129.254.184.79"
@@ -53,6 +108,395 @@ var monitoring *bool
 var delVMAWS *bool
 var delVMGCP *bool
 var delVMAZURE *bool
+
+func apiServer() {
+
+	e := echo.New()
+
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
+
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World! This is cloud-barista Poc-farmoni")
+	})
+
+	// Routeso
+	/*
+	e.POST("/users", createUser)
+	e.GET("/users/:id", getUser)
+	e.PUT("/users/:id", updateUser)
+	e.DELETE("/users/:id", deleteUser)
+	*/
+
+        e.POST("/svcs", createSvc)
+        e.GET("/svcs/:id", getSvc)
+	e.GET("/svcs", getSvcs)
+	e.PUT("/svcs/:id", updateSvc)
+        e.DELETE("/svcs/:id", deleteSvc)
+	e.DELETE("/svcs", deleteAllSvc)
+
+
+	e.Logger.Fatal(e.Start(":1323"))
+
+
+}
+
+// API Handlers
+
+/*
+func createUser(c echo.Context) error {
+	u := &user{
+		ID: seq,
+	}
+	if err := c.Bind(u); err != nil {
+		return err
+	}
+	users[u.ID] = u
+	seq++
+	return c.JSON(http.StatusCreated, u)
+}
+
+func getUser(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	return c.JSON(http.StatusOK, users[id])
+}
+
+func updateUser(c echo.Context) error {
+	u := new(user)
+	if err := c.Bind(u); err != nil {
+		return err
+	}
+	id, _ := strconv.Atoi(c.Param("id"))
+	users[id].Name = u.Name
+	return c.JSON(http.StatusOK, users[id])
+}
+
+func deleteUser(c echo.Context) error {
+	id, _ := strconv.Atoi(c.Param("id"))
+	delete(users, id)
+	return c.NoContent(http.StatusNoContent)
+}
+*/
+
+func createSvc(c echo.Context) error {
+        u := &svc{
+                ID: int(time.Now().UnixNano() / 1e6),
+        }
+        if err := c.Bind(u); err != nil {
+                return err
+        }
+        svcs[u.ID] = u
+	fmt.Print("CSP"+u.CSP)
+
+
+	//addServiceToEtcd(strconv.Itoa(u.ID), u.NAME)
+
+	if u.CSP == "aws" {
+		fmt.Println("######### addVMaws....")
+		instanceIds, publicIPs := addVMaws(u.NUM)
+
+		for i := 0; i < len(instanceIds) && i < len(publicIPs); i++{
+			fmt.Println("[instanceIds=] " + string(*instanceIds[i]) + "[publicIPs]" +  string(*publicIPs[i]) )
+			addServerToService(strconv.Itoa(u.ID), u.NAME,"aws", instanceIds, publicIPs)
+		}
+
+        }
+	if u.CSP == "gcp" {
+                fmt.Println("######### addVMgcp....")
+		instanceIds, publicIPs := addVMgcp(u.NUM)
+
+                for i := 0; i < len(instanceIds) && i < len(publicIPs); i++{
+                        fmt.Println("[instanceIds=] " + string(*instanceIds[i]) + "[publicIPs]" +  string(*publicIPs[i]) )
+                        addServerToService(strconv.Itoa(u.ID), u.NAME,"gcp", instanceIds, publicIPs)
+                }
+
+        }
+	if u.CSP == "azure" {
+                fmt.Println("######### addVMazure....")
+		instanceIds, publicIPs := addVMazure(u.NUM)
+
+                for i := 0; i < len(instanceIds) && i < len(publicIPs); i++{
+                        fmt.Println("[instanceIds=] " + string(*instanceIds[i]) + "[publicIPs]" +  string(*publicIPs[i]) )
+                        addServerToService(strconv.Itoa(u.ID), u.NAME,"azure", instanceIds, publicIPs)
+                }
+	}
+/*
+	for _, v := range instanceIds {
+                //vs := strings.Split(string(*v), "/")
+
+                fmt.Println("[instanceIds=] " + v )
+        }
+*/
+
+        seqSvc++
+        return c.JSON(http.StatusCreated, u)
+}
+
+type server struct {
+        CSP  string `json:"csp"`
+        VMID string `json:"vmid"`
+        IP   string `json:"ip"`
+}
+type stService struct {
+        ID   int    `json:"id"`
+        NAME string `json:"name"`
+        SERVER []server `json:"server"`
+}
+
+
+func getSvc(c echo.Context) error {
+        id, _ := strconv.Atoi(c.Param("id"))
+
+
+
+        return c.JSON(http.StatusOK, svcs[id])
+}
+
+
+
+
+func getSvcs(c echo.Context) error {
+
+	/*
+	type server struct {
+		CSP  string `json:"csp"`
+	        VMID string `json:"vmid"`
+                IP   string `json:"ip"`
+        }
+
+
+	var content struct {
+		ID   int    `json:"id"`
+                NAME string `json:"name"`
+                SERVER []server `json:"server"`
+		Response  string    `json:"response"`
+		Timestamp time.Time `json:"timestamp"`
+		Random    int       `json:"random"`
+	}
+	*/
+	var content struct {
+		SERVICE []stService `json:"service"`
+		Response  string    `json:"response"`
+        	Timestamp time.Time `json:"timestamp"`
+	        Random    int       `json:"random"`
+	}
+	/*
+	content.Response = "Sent via JSONP"
+	content.Timestamp = time.Now().UTC()
+	content.Random = 1000
+*/
+
+//	content.ID = 123123
+//	content.NAME = "name"
+/*
+	sv := server{"a","b","c"}
+
+	svcTmp := stService{}
+	svcTmp.ID = 12345
+	svcTmp.NAME = "NameST"
+	svcTmp.SERVER = append(svcTmp.SERVER, sv)
+
+	content.SERVICE = append(content.SERVICE, svcTmp)
+*/
+	/*
+	type (
+        svc struct {
+                ID   int    `json:"id"`
+                NAME string `json:"name"`
+                SERVER []struct {
+                        CSP  string `json:"csp"`
+                        NUM  int    `json:"num"`
+                        VMID string `json:"vmid"`
+                        IP   string `json:"ip"`
+                }`json:"server"`
+        }
+	)
+*/
+
+
+        list := getServerList()
+        fmt.Print("######### all server list....(" + strconv.Itoa(len(list)) + ")\n")
+
+
+        for _, v := range list {
+                vs := strings.Split(string(*v), "/")
+		
+                fmt.Println("[CSP] " + vs[0] + "\t/ [VmID] "+ vs[1] +"\t/ [IP] " + vs[2])
+        }
+
+	serviceList()
+
+	serviceList := getServiceList()
+        fmt.Print("######### all service list....(" + strconv.Itoa(len(serviceList)) + ")\n")
+
+
+	checkDuplication := "inital"
+        for _, k := range serviceList {
+                slice0 := strings.Split(string(*k), "/server/")
+		slice00 := strings.Split(string(slice0[0]), "/")
+		//slice01 := strings.Split(string(slice0[1]), "/")
+
+		if checkDuplication != slice00[0] {
+
+			svcTmp := stService{}
+			svcTmp.ID, _ = strconv.Atoi(slice00[0])
+			svcTmp.NAME = slice00[1]
+
+			slice01 := getServersInServiceFromEtcd(slice00[0])
+
+			for _, j := range slice01 {
+
+				//fmt.Println("[VM-CSP] " + string(*j))
+				serverInfo := strings.Split(string(*j), "/")
+				//sv := server{string(j[0]),string(j[1]),string(j[2])}
+				sv := server{string(serverInfo[0]),string(serverInfo[1]),string(serverInfo[2])}
+				svcTmp.SERVER = append(svcTmp.SERVER, sv)
+			}
+			content.SERVICE = append(content.SERVICE, svcTmp)
+			checkDuplication = slice00[0] 
+		}
+
+//		fmt.Println("[Service]"+ string(vs[0]) +"\n")
+        }
+        content.Response = "Sent via Cloud-Barista"
+        content.Timestamp = time.Now().UTC()
+        content.Random = 1000
+
+
+        return c.JSON(http.StatusOK, &content)
+}
+
+func updateSvc(c echo.Context) error {
+        u := new(svc)
+        if err := c.Bind(u); err != nil {
+                return err
+        }
+        id, _ := strconv.Atoi(c.Param("id"))
+        svcs[id].NAME = u.NAME
+        return c.JSON(http.StatusOK, svcs[id])
+}
+
+func deleteSvc(c echo.Context) error {
+        id, _ := strconv.Atoi(c.Param("id"))
+        delete(svcs, id)
+	//delServicesFromEtcd()
+
+        return c.NoContent(http.StatusNoContent)
+}
+
+func deleteAllSvc(c echo.Context) error {
+        //id, _ := strconv.Atoi(c.Param("id"))
+        //delete(svcs, id)
+        delServicesFromEtcd()
+
+        fmt.Println("######### delete all servers in AWS....")
+        delAllVMaws()
+        fmt.Println("######### delete all servers in GCP....")
+        delAllVMgcp()
+        fmt.Println("######### delete all servers in AZURE....")
+        delAllVMazure()
+
+        return c.NoContent(http.StatusNoContent)
+}
+
+
+func addServiceToEtcd(svcId string, svcName string) {
+
+        etcdcli, err := etcdhandler.Connect(etcdServerPort)
+        if err != nil {
+                panic(err)
+        }
+
+        defer etcdhandler.Close(etcdcli)
+
+        ctx := context.Background()
+
+	etcdhandler.AddService(ctx, etcdcli, &svcId, &svcName, fetchType)
+}
+
+func getServersInServiceFromEtcd(svcId string) []*string {
+
+        etcdcli, err := etcdhandler.Connect(etcdServerPort)
+        if err != nil {
+                panic(err)
+        }
+
+        defer etcdhandler.Close(etcdcli)
+
+        ctx := context.Background()
+
+	return etcdhandler.GetServersInService(ctx, etcdcli, &svcId)
+}
+
+
+func delServicesFromEtcd() {
+        etcdcli, err := etcdhandler.Connect(etcdServerPort)
+        if err != nil {
+                panic(err)
+        }
+        fmt.Println("connected to etcd - " + *etcdServerPort)
+
+        defer etcdhandler.Close(etcdcli)
+
+        ctx := context.Background()
+
+        fmt.Println("######### delete  all Services....")
+        etcdhandler.DelAllSvcs(ctx, etcdcli)
+}
+
+
+
+func addServerToService(svcId string, svcName string, provider string, instanceIds []*string, serverIPs []*string) {
+
+        etcdcli, err := etcdhandler.Connect(etcdServerPort)
+        if err != nil {
+                panic(err)
+        }
+        fmt.Println("connected to etcd - " + *etcdServerPort)
+
+        defer etcdhandler.Close(etcdcli)
+
+        ctx := context.Background()
+
+        for i, v := range serverIPs {
+                serverPort := *v + ":2019" // 2019 Port is dedicated value for PoC.
+                fmt.Println("######### addServer...." + serverPort)
+                // /server/aws/i-1234567890abcdef0/129.254.175:2019  PULL
+                etcdhandler.AddServerToService(ctx, etcdcli, &svcId, &svcName, &provider, instanceIds[i], &serverPort, fetchType)
+        }
+
+}
+
+func serviceList() {
+
+        list := getServiceList()
+        fmt.Print("######### all serivce list....(" + strconv.Itoa(len(list)) + ")\n")
+
+
+        for _, v := range list {
+//                vs := strings.Split(string(*v), "/")
+                fmt.Println("[Service]"+ string(*v) +"\n")
+        }
+}
+
+func getServiceList() []*string {
+
+        etcdcli, err := etcdhandler.Connect(etcdServerPort)
+        if err != nil {
+                panic(err)
+        }
+        fmt.Println("connected to etcd - " + *etcdServerPort)
+
+        defer etcdhandler.Close(etcdcli)
+
+        ctx := context.Background()
+        return etcdhandler.ServiceList(ctx, etcdcli)
+}
+
+
+
+
 
 
 func parseRequest() {
@@ -82,8 +526,8 @@ func parseRequest() {
 
 func getInteractiveRequest() {
 
-	command := 0
-	fmt.Println("[Select opt (1:create-vm, 2:delete-vm, 3:list-vm, 4:monitor-vm]")
+	command := -1
+	fmt.Println("[Select opt (0:API-server, 1:create-vm, 2:delete-vm, 3:list-vm, 4:monitor-vm]")
 	fmt.Print("Your section : ")
 	fmt.Scanln(&command)
 	fmt.Println(command)
@@ -96,6 +540,8 @@ func getInteractiveRequest() {
         }
 	*/
 	switch {
+        case command == 0:
+                apiServer()
 	case command == 1:
 	        selCsp := 0
 	        fmt.Println("[Select cloud service provider (1:aws, 2:gcp, 3:azure, 4:TBD]")
@@ -267,6 +713,7 @@ func main() {
                 delAllVMazure()
         }
 
+
 }
 
 
@@ -276,7 +723,7 @@ func main() {
 // 1.3. insert Farmoni Agent into Servers.
 // 1.4. execute Servers' Agent.
 // 1.5. add server list into etcd.
-func addVMaws(count int) {
+func addVMaws(count int) ([]*string, []*string) {
 // ==> AWS-EC2
     //region := "ap-northeast-2" // seoul region.
     region := masterConfigInfos.AWS.REGION // seoul region.
@@ -314,7 +761,7 @@ func addVMaws(count int) {
             publicIP, err := ec2handler.GetPublicIP(svc, *v)
             if err != nil {
                 fmt.Println("Error", err)
-                return
+                return nil, nil
             }
             fmt.Println("==============> " + publicIP);
 	    publicIPs[k] = &publicIP
@@ -337,6 +784,8 @@ func addVMaws(count int) {
 
 // 1.5. add server list into etcd.
     addServersToEtcd("aws", instanceIds, publicIPs)
+
+    return instanceIds, publicIPs
 }
 
 // (1) get all AWS server id list from etcd
@@ -506,7 +955,7 @@ func copyAndPlayAgent(serverIP string, userName string, keyPath string) error {
 // 1.3. insert Farmoni Agent into Servers.
 // 1.4. execute Servers' Agent.
 // 1.5. add server list into etcd.
-func addVMgcp(count int) {
+func addVMgcp(count int) ([]*string, []*string) {
 // ==> GCP-GCE
 
 /*
@@ -590,6 +1039,8 @@ func addVMgcp(count int) {
 
 // 1.5. add server list into etcd.
     addServersToEtcd("gcp", instanceIds, publicIPs)
+
+    return instanceIds, publicIPs
 }
 
 
@@ -598,7 +1049,7 @@ func addVMgcp(count int) {
 // 1.3. insert Farmoni Agent into Servers.
 // 1.4. execute Servers' Agent.
 // 1.5. add server list into etcd.
-func addVMazure(count int) {
+func addVMazure(count int) ([]*string, []*string) {
 // ==> AZURE-Compute
 
 /*
@@ -748,6 +1199,8 @@ type NICInfo struct {
 
 // 1.5. add server list into etcd.
     addServersToEtcd("azure", instanceIds, publicIPs)
+
+    return instanceIds, publicIPs
 }
 
 

@@ -30,6 +30,102 @@ func Close(cli *clientv3.Client) {
 	cli.Close()
 }
 
+// manage service resources
+
+func AddService(ctx context.Context, cli *clientv3.Client, svcId *string, svcName *string, fetchtype *string) {
+        // /server/aws/i-1234567890abcdef0/129.254.175:2019  PULL
+        cli.Put(ctx, "/service/"+ *svcId + "/" + *svcName, *fetchtype)
+        fmt.Println("added a " + *svcId + "-"+ *svcName + " into the Service List...\n")
+}
+
+func AddServerToService(ctx context.Context, cli *clientv3.Client, svcId *string, svcName *string, provider *string, instanceId *string, addserver *string, fetchtype *string) {
+        // /server/aws/i-1234567890abcdef0/129.254.175:2019  PULL
+        cli.Put(ctx, "/service/"+ *svcId + "/" + *svcName + "/server/"+ *provider + "/" + *instanceId + "/" + *addserver, *fetchtype)
+        fmt.Println("added a server" + *svcId + "<-"+ *instanceId + " into Service...\n")
+}
+
+func GetServersInService(ctx context.Context, cli *clientv3.Client, serviceId *string) []*string {
+        // get with prefix, all list of /service's key
+        resp, err := cli.Get(ctx, "/service/" + *serviceId, clientv3.WithPrefix(), clientv3.WithSort(clientv3.SortByKey, clientv3.SortDescend))
+        if err != nil {
+                log.Fatal(err)
+        }
+
+        serverList := make([]*string, len(resp.Kvs))
+        for k, ev := range resp.Kvs {
+                //fmt.Printf("%s : %s\n", strings.Trim(string(ev.Key), "/server/"), ev.Value)
+                // /server/aws/i-1234567890abcdef0/129.254.175:2019
+
+                //tmpStr := strings.Trim(string(ev.Key), "/server/")
+                tmpStrs := strings.Split(string(ev.Key), "/server/")
+                serverList[k] = &tmpStrs[1]
+                //serverList[k] = &tmpStr
+        }
+
+        return serverList
+}
+
+
+/*
+func AddServerToSvc(ctx context.Context, cli *clientv3.Client, provider *string, instanceId *string, addserver *string, fetchtype *string) {
+        // /server/aws/i-1234567890abcdef0/129.254.175:2019  PULL
+        cli.Put(ctx, "/server/"+ *provider + "/" + *instanceId + "/" + *addserver, *fetchtype)
+        fmt.Println("added a " + *addserver + " into the Server List...\n")
+}
+
+
+func DelSvc(ctx context.Context, cli *clientv3.Client, delserver *string) {
+        // get with prefix, all list of /server's key
+        resp, err := cli.Get(ctx, "/server", clientv3.WithPrefix(), clientv3.WithSort(clientv3.SortByKey, clientv3.SortDescend))
+        if err != nil {
+                log.Fatal(err)
+        }
+
+        for _, ev := range resp.Kvs {
+                //fmt.Printf("%s : %s\n", strings.Trim(string(ev.Key), "/server/"), ev.Value)
+                // /server/aws/i-1234567890abcdef0/129.254.175:2019
+                if strings.Contains(string(ev.Key), *delserver) {
+                        cli.Delete(ctx, string(ev.Key))
+                        fmt.Println("deleted a " + *delserver + " from the Server List...\n")
+                }
+        }
+}
+*/
+func DelAllSvcs(ctx context.Context, cli *clientv3.Client) {
+        // delete all list of /server's key with prefix
+        _, err:=cli.Delete(ctx, "/service", clientv3.WithPrefix())
+        fmt.Println("deleted all service list...\n")
+        if err != nil {
+                log.Fatal(err)
+        }
+
+}
+
+func ServiceList(ctx context.Context, cli *clientv3.Client) []*string {
+        // get with prefix, all list of /service's key
+        resp, err := cli.Get(ctx, "/service", clientv3.WithPrefix(), clientv3.WithSort(clientv3.SortByKey, clientv3.SortDescend))
+        if err != nil {
+                log.Fatal(err)
+        }
+
+        serviceList := make([]*string, len(resp.Kvs))
+        for k, ev := range resp.Kvs {
+                //fmt.Printf("%s : %s\n", strings.Trim(string(ev.Key), "/server/"), ev.Value)
+                // /server/aws/i-1234567890abcdef0/129.254.175:2019
+
+                tmpStr := strings.Trim(string(ev.Key), "/service/")
+                //tmpStrs := strings.Split(string(tmpStr), "/")
+                //serverList[k] = &tmpStrs[2]
+                serviceList[k] = &tmpStr
+        }
+
+        return serviceList
+}
+
+
+
+// manage server resources
+
 func AddServer(ctx context.Context, cli *clientv3.Client, provider *string, instanceId *string, addserver *string, fetchtype *string) {
 	// /server/aws/i-1234567890abcdef0/129.254.175:2019  PULL
 	cli.Put(ctx, "/server/"+ *provider + "/" + *instanceId + "/" + *addserver, *fetchtype)

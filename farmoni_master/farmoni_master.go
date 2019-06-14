@@ -237,6 +237,7 @@ type server struct {
         CSP  string `json:"csp"`
         VMID string `json:"vmid"`
         IP   string `json:"ip"`
+        AGENT_PORT   string `json:"agent_port"`
 }
 type stService struct {
         ID   int    `json:"id"`
@@ -350,7 +351,10 @@ func getSvcs(c echo.Context) error {
 				//fmt.Println("[VM-CSP] " + string(*j))
 				serverInfo := strings.Split(string(*j), "/")
 				//sv := server{string(j[0]),string(j[1]),string(j[2])}
-				sv := server{string(serverInfo[0]),string(serverInfo[1]),string(serverInfo[2])}
+				//fmt.Println("string(serverInfo[2]): ", string(serverInfo[2])); // jhseo debug
+				ip_port := strings.Split(string(serverInfo[2]), ":"); // jhseo
+				//fmt.Println("ip: ", ip_port[0], ", port: ", ip_port[1]); // jhseo debug
+				sv := server{string(serverInfo[0]),string(serverInfo[1]), ip_port[0], ip_port[1]}
 				svcTmp.SERVER = append(svcTmp.SERVER, sv)
 			}
 			content.SERVICE = append(content.SERVICE, svcTmp)

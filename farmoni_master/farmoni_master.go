@@ -414,7 +414,8 @@ func addServiceToEtcd(svcId string, svcName string) {
 
         defer etcdhandler.Close(etcdcli)
 
-        ctx := context.Background()
+        //ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 
 	etcdhandler.AddService(ctx, etcdcli, &svcId, &svcName, fetchType)
 }
@@ -428,7 +429,8 @@ func getServersInServiceFromEtcd(svcId string) []*string {
 
         defer etcdhandler.Close(etcdcli)
 
-        ctx := context.Background()
+        //ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 
 	return etcdhandler.GetServersInService(ctx, etcdcli, &svcId)
 }
@@ -439,11 +441,11 @@ func delServicesFromEtcd() {
         if err != nil {
                 panic(err)
         }
-        fmt.Println("connected to etcd - " + *etcdServerPort)
 
         defer etcdhandler.Close(etcdcli)
 
-        ctx := context.Background()
+        //ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 
         fmt.Println("######### delete  all Services....")
         etcdhandler.DelAllSvcs(ctx, etcdcli)
@@ -457,11 +459,11 @@ func addServerToService(svcId string, svcName string, provider string, instanceI
         if err != nil {
                 panic(err)
         }
-        fmt.Println("connected to etcd - " + *etcdServerPort)
 
         defer etcdhandler.Close(etcdcli)
 
-        ctx := context.Background()
+        //ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 
         for i, v := range serverIPs {
                 serverPort := *v + ":2019" // 2019 Port is dedicated value for PoC.
@@ -490,11 +492,12 @@ func getServiceList() []*string {
         if err != nil {
                 panic(err)
         }
-        fmt.Println("connected to etcd - " + *etcdServerPort)
 
         defer etcdhandler.Close(etcdcli)
 
-        ctx := context.Background()
+        //ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
+
         return etcdhandler.ServiceList(ctx, etcdcli)
 }
 
@@ -865,11 +868,11 @@ func addServersToEtcd(provider string, instanceIds []*string, serverIPs []*strin
         if err != nil {
                 panic(err)
         }
-        fmt.Println("connected to etcd - " + *etcdServerPort)
 
         defer etcdhandler.Close(etcdcli)
 
-        ctx := context.Background()
+        //ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
 
         for i, v := range serverIPs {
                 serverPort := *v + ":2019" // 2019 Port is dedicated value for PoC.
@@ -886,7 +889,6 @@ func delProviderAllServersFromEtcd(provider string) {
         if err != nil {
                 panic(err)
         }
-        fmt.Println("connected to etcd - " + *etcdServerPort)
 
         defer etcdhandler.Close(etcdcli)
 
@@ -1226,11 +1228,11 @@ func getServerList() []*string {
         if err != nil {
                 panic(err)
         }
-        fmt.Println("connected to etcd - " + *etcdServerPort)
 
         defer etcdhandler.Close(etcdcli)
 
-        ctx := context.Background()
+        //ctx := context.Background()
+	ctx, _ := context.WithTimeout(context.Background(), 3*time.Second)
         return etcdhandler.ServerList(ctx, etcdcli)
 }
 
@@ -1239,7 +1241,6 @@ func getInstanceIdListAWS() []*string {
         if err != nil {
                 panic(err)
         }
-        fmt.Println("connected to etcd - " + *etcdServerPort)
 
         defer etcdhandler.Close(etcdcli)
 
@@ -1252,7 +1253,6 @@ func getInstanceIdListGCP() []*string {
         if err != nil {
                 panic(err)
         }
-        fmt.Println("connected to etcd - " + *etcdServerPort)
 
         defer etcdhandler.Close(etcdcli)
 
@@ -1265,7 +1265,6 @@ func getInstanceIdListAZURE() []*string {
         if err != nil {
                 panic(err)
         }
-        fmt.Println("connected to etcd - " + *etcdServerPort)
 
         defer etcdhandler.Close(etcdcli)
 

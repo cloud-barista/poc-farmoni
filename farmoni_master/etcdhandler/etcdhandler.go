@@ -17,10 +17,10 @@ import (
 
 
 func Connect(moniServerPort *string) (*clientv3.Client, error) {
-
 	etcdcli, err := clientv3.New(clientv3.Config{
 		Endpoints:   []string{"http://" + *moniServerPort},
-                DialTimeout: 5 * time.Second,
+                //DialTimeout: 5 * time.Second,
+                DialTimeout: 3 * time.Second,
         })
 
 	return etcdcli, err

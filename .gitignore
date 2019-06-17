@@ -1,0 +1,6 @@
+# Binaries
+farmoni_agent/farmoni_agent
+farmoni_master/farmoni_master
+
+# Config file for farmoni_master
+farmoni_master/conf/config.yaml

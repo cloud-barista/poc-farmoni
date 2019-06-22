@@ -12,12 +12,12 @@ aws:
   imageid: ami-047f7b46bd6dd5d84 
   instancenameprefix: awspowerkim  # EC2's Tag Name for group instances' ID
   instancetype: t2.micro
-  securitygroupid: sg-2334584f
-  subnetid: subnet-8c4a53e4
+  securitygroupid: sg-07ec42983dbc5e36e
+  subnetid: subnet-c3b446ab
 # for VM
   username: ec2-user
-  keyname: aws.powerkim.keypair
-  keyfilepath: /root/.aws/awspowerkimkeypair.pem 
+  keyname: powerkimkeypair
+  keyfilepath: /root/.aws/powerkimkeypair.pem 
 
 
 ## Config for GCP ##
@@ -29,19 +29,19 @@ gcp:
   region: us-east1
   zone: us-east1-c
 # Project & Prefix for GCP
-  projectid: ornate-course-236606
-  prefix: https://www.googleapis.com/compute/v1/projects/ornate-course-236606
+  projectid: powerkim-prj
+  prefix: https://www.googleapis.com/compute/v1/projects/powerkim-prj
 # Infos for creating Instnaces
   imageid: projects/gce-uefi-images/global/images/centos-7-v20190326
   instancenameprefix: gcepowerkim
-  instancetype: https://www.googleapis.com/compute/v1/projects/ornate-course-236606/zones/us-east1-c/machineTypes/f1-micro
-  subnetid: https://www.googleapis.com/compute/v1/projects/ornate-course-236606/regions/us-east1/subnetworks/default
-  networkname: https://www.googleapis.com/compute/v1/projects/ornate-course-236606/global/networks/default
+  instancetype: https://www.googleapis.com/compute/v1/projects/powerkim-prj/zones/us-east1-c/machineTypes/f1-micro
+  subnetid: https://www.googleapis.com/compute/v1/projects/powerkim-prj/regions/us-east1/subnetworks/default
+  networkname: https://www.googleapis.com/compute/v1/projects/powerkim-prj/global/networks/default
   serviceAccoutsMail: default
 # for VM
   username: byoungseob
   keyname: empty
-  keyfilepath: /root/.gcp/gcppowerkimkeypair.pem 
+  keyfilepath: /root/.gcp/gce-vm-key
 
 
 

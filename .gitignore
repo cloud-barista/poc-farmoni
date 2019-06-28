@@ -4,3 +4,6 @@ farmoni_master/farmoni_master
 
 # Config file for farmoni_master
 farmoni_master/conf/config.yaml
+
+# etcd-generated files
+farmoni_master/conf/etcd-01.etcd/

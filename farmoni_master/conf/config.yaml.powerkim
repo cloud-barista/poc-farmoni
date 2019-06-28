@@ -9,13 +9,14 @@ aws:
 # Infos of Region
   region: ap-northeast-2
 # Infos for creating Instnaces
-  imageid: ami-047f7b46bd6dd5d84 
+  imageid: ami-0aac5115a81661baf
   instancenameprefix: awspowerkim  # EC2's Tag Name for group instances' ID
-  instancetype: t2.micro
+  instancetype: t2.medium
   securitygroupid: sg-07ec42983dbc5e36e
   subnetid: subnet-c3b446ab
 # for VM
-  username: ec2-user
+  #username: ec2-user
+  username: ubuntu
   keyname: powerkimkeypair
   keyfilepath: /root/.aws/powerkimkeypair.pem 
 
@@ -32,9 +33,9 @@ gcp:
   projectid: powerkim-prj
   prefix: https://www.googleapis.com/compute/v1/projects/powerkim-prj
 # Infos for creating Instnaces
-  imageid: projects/gce-uefi-images/global/images/centos-7-v20190326
+  imageid: projects/gce-uefi-images/global/images/ubuntu-1804-bionic-v20190617
   instancenameprefix: gcepowerkim
-  instancetype: https://www.googleapis.com/compute/v1/projects/powerkim-prj/zones/us-east1-c/machineTypes/f1-micro
+  instancetype: https://www.googleapis.com/compute/v1/projects/powerkim-prj/zones/us-east1-c/machineTypes/n1-standard-2
   subnetid: https://www.googleapis.com/compute/v1/projects/powerkim-prj/regions/us-east1/subnetworks/default
   networkname: https://www.googleapis.com/compute/v1/projects/powerkim-prj/global/networks/default
   serviceAccoutsMail: default

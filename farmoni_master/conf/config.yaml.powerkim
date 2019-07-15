@@ -9,7 +9,7 @@ aws:
 # Infos of Region
   region: ap-northeast-2
 # Infos for creating Instnaces
-  imageid: ami-0aac5115a81661baf
+  imageid: ami-0d0bbf63
   instancenameprefix: awspowerkim  # EC2's Tag Name for group instances' ID
   instancetype: t2.medium
   securitygroupid: sg-07ec42983dbc5e36e

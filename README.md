@@ -89,14 +89,8 @@ export AZURE_AUTH_LOCATION=~/.azure/azure.auth
 ### 클라우드 인증 키 생성 및 설정
 #### AWS 인증 키 생성 및 설정
 - 참고: https://docs.aws.amazon.com/ko_kr/sdk-for-go/v1/developer-guide/setting-up.html
-![Get your AWS access keys](doc/images/farmoni-guide-figures/01-get-your-aws-access-keys.png)
 - AWS 콘솔 접속. https://console.aws.amazon.com/iam/home?region=ap-northeast-2#
 - IAM 사용자 추가 및 인증 키 (.csv) 다운로드
-![AWS - Create IAM user](doc/images/farmoni-guide-figures/02-aws-create-iam-user.png)
-![AWS - Create IAM user](doc/images/farmoni-guide-figures/03-aws-create-iam-user.png)
-![AWS - Add user to group](doc/images/farmoni-guide-figures/04-aws-add-user-to-group.png)
-![AWS - Confirm user creation](doc/images/farmoni-guide-figures/05-aws-confirm-user-creation.png)
-![AWS - IAM user created](doc/images/farmoni-guide-figures/06-aws-iam-user-created.png)
 - `~/.aws/credentials` 파일 생성
 ```
 [default]
@@ -111,15 +105,12 @@ aws_secret_access_key = <YOUR_SECRET_ACCESS_KEY>
 
 #### GCE 인증 키 생성 및 설정
 - 관련 정보: https://github.com/danackerson/googleComputeEngine
-![A guide for GCE](doc/images/farmoni-guide-figures/08-gce-guide.png)
 - 프로젝트 생성
   - https://console.cloud.google.com/projectselector2/home/dashboard?organizationId=0&supportedpurview=project&authuser=2
-![GCP - Create project](doc/images/farmoni-guide-figures/07-gcp-create-project.png)
 - API 접속을 위한 서비스 계정 생성
   - 프로젝트 설정으로 이동
   - IAM 및 서비스계정 -> 서비스 계정 선택
   - https://console.cloud.google.com/iam-admin/serviceaccounts?authuser=2&project=your-project-name&supportedpurview=project
-  ![GCP - Create IAM user](doc/images/farmoni-guide-figures/09-gcp-create-iam-user.png)
   - 키 생성 및 다운로드
     - 예: `~/.gcp/gcp-etri-jhseo-test-ed06e580674a.json`
 - VM SSH 접속을 위한 키 생성
@@ -129,12 +120,9 @@ aws_secret_access_key = <YOUR_SECRET_ACCESS_KEY>
 # cat ~/.gcp/gce-vm-key.pub
 ```
 - 해당 퍼블릭 키를 GCE에 등록
-![GCP - Register SSH key](doc/images/farmoni-guide-figures/10-gcp-register-ssh-key.png)
 - 에이전트 통신을 위한 방화벽 추가
   - https://console.cloud.google.com/networking/firewalls/list?authuser=2&project=[my-project-name]&supportedpurview=project&firewallTablesize=50
-  ![GCP - Firewall rules](doc/images/farmoni-guide-figures/11-gcp-firewall-rules.png)
-  ![GCP - Create firewall rules](doc/images/farmoni-guide-figures/12-gcp-create-firewall-rule.png)
-
+  
 #### Azure 인증 키 생성 및 설정
 - Azure CLI 인증 키 설정
 ```Shell
